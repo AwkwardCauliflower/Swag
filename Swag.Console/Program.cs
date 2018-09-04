@@ -88,9 +88,11 @@ Swag root webFolder [blacklistedName]*
                    
 Example usage:
 
-If you have a website running at the root of your X: drive with two folders named 'Y' and 'Z' which you don't want included, and you want Swag's folder to be named 'www', you would use the following command:
+If you have a website running at the root of your X: drive with two folders named 'GIFs' and 'Thumbnails' which you don't want included, and you want Swag's folder to be named 'www', you would use the following command:
+    
+    Swag X:\ www GIFs Thumbnails
 
-  Swag X:\ www Y Z";
+Note: this will exclude all directories and files that contain the words 'GIFs' or 'Thumbnails'. If you'd prefer, you can specify a full path to a directory to exclude. Use double quotes if the path contains spaces.";
 
             if ( message != null )
             {
@@ -115,51 +117,14 @@ If you have a website running at the root of your X: drive with two folders name
 
         private static void GenerateGallery( string path, string webFolderName, List<string> blacklist = null )
         {
-            SynchronizationContext.SetSynchronizationContext( new SynchronizationContext() );
-
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-            bool taskRunning = true;
-
-            var task = Task.Factory.StartNew(
-                () =>
-                {
-                    Generator gen = new Generator( path, webFolderName, blacklist, deleteWebFolder: true );
-                    gen.PopulateImageTree( cancellationTokenSource.Token );
-                    gen.GenerateWebsite( cancellationTokenSource.Token );
-                },
-                cancellationTokenSource.Token
-            ).ContinueWith(
-                t =>
-                {
-                    if ( t.IsFaulted )
-                    {
-                        foreach ( var ex in t.Exception.InnerExceptions )
-                        {
-                            Console.WriteLine( ex.ToString() );
-                            Console.WriteLine();
-                        }
-                    }
-                    else if ( t.IsCanceled )
-                    {
-                        Console.WriteLine( "Cancelled." );
-                    }
-                    else
-                    {
-                        Console.WriteLine( "Complete." );
-                    }
-
-                    taskRunning = false;
-                },
-                CancellationToken.None,
-                TaskContinuationOptions.None,
-                TaskScheduler.FromCurrentSynchronizationContext()
-            );
-
-            while ( taskRunning ) ;
+            Generator gen = new Generator( path, webFolderName, blacklist, deleteWebFolder: true );
+            gen.PopulateImageTree( cancellationTokenSource.Token );
+            gen.GenerateWebsite( cancellationTokenSource.Token );
 
             sw.Stop();
 
