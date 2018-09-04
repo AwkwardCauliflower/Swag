@@ -81,8 +81,8 @@ Swag root webFolder [blacklistedName]*
   webFolder        A name of a folder into which the site files will be
                    generated. E.g., www.
                    
-  blacklistedName  Any number of strings separated by spaces. Any paths
-                   containing any of the strings will not be parsed. The 
+  blacklistedName  Any number of strings separated by spaces. Paths
+                   containing any of the strings will be ignored. The 
                    webFolder name is automatically blacklisted, as are all
                    system folders.
                    
