@@ -88,7 +88,7 @@ Swag root webFolder [blacklistedName]*
                    
 Example usage:
 
-If you have a website running at the root of your X: drive with two folders named 'Y' and 'Z' which you don't want included, you would use the following command:
+If you have a website running at the root of your X: drive with two folders named 'Y' and 'Z' which you don't want included, and you want Swag's folder to be named 'www', you would use the following command:
 
   Swag X:\ www Y Z";
 
