@@ -20,8 +20,6 @@ Swag will read and use Windows shortcut files as long as they point to images wi
 
 # Usage
 
-First, you must setup your website. This can be as simple as creating a new website in IIS (Internet Information Services, built into Windows) that points to the root folder of images, and then running the tool pointing at that same path. There are many simple web server programs you can install as well. Any vanilla HTTP server will do. There is no back-end code in Swag. It simply generates static HTML, CSS, JavaScript, and JSON files.
-
 Swag is a command line tool. It has two required arguments: the path to the root of your website, and the name of a folder to create inside of it to contain all of its files. You can optionally blacklist certain paths from being parsed by Swag. It can be useful to create a batch file with your parameters to make repeat usage of the tool easier.
 
     Swag root webFolder [blacklistedName]*
@@ -37,13 +35,19 @@ Swag is a command line tool. It has two required arguments: the path to the root
                        webFolder name is automatically blacklisted, as are all
                        system folders.
 
-If you have a website running at the root of your X: drive with two folders named 'Y' and 'Z' which you don't want included, and you want Swag's folder to be named 'www', you would use the following command:
+If you have a website running at the root of your X: drive with two folders named 'GIFs' and 'Thumbnails' which you don't want included, and you want Swag's folder to be named 'www', you would use the following command:
     
-    Swag X:\ www Y Z
+    Swag X:\ www GIFs Thumbnails
+    
+Note: this will exclude all directories and files that contain the words 'GIFs' or 'Thumbnails'. If you'd prefer, you can specify a full path to a directory to exclude. Use double quotes if the path contains spaces.
+
+When Swag runs, you will see a series of "Scan: " messages, one for each directory it scans. When scanning is complete, you will see a series of "Generate: " messages. If you press Ctrl-C to abort the program before the generation process begins, no changes will have been made to your files. If you abort the program after generation has begun, it will already have deleted the previous Swag output folder and replaced it with a partial one.
+
+If you want to browse the resultant website after Swag runs, you must setup an HTTP server. This can be as simple as creating a new website in IIS (Internet Information Services, built into Windows) that points to the root folder you pointed Swag at. There are many simple web server programs you can install as well. Any vanilla HTTP server will do. There is no back-end code in Swag. It simply generates static HTML, CSS, JavaScript, and JSON files.
       
 # Building Swag Yourself
 
-Swag requires .Net 4.5. It has no external dependencies, but it uses [ILMerge](https://www.microsoft.com/en-us/download/details.aspx?id=17630) in a post-build event to create a self-contained EXE. You can remove this post-build event if you don't wish to install or use ILMerge.
+Swag requires .Net 4.5. It was built using [Microsoft Visual Studio Community 2017](https://visualstudio.microsoft.com/free-developer-offers/).
 
 # Future Changes
 
