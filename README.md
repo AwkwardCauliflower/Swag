@@ -4,7 +4,7 @@ Static Web Album Generator
 
 Swag generates a recursive image-viewing web site for an entire directory tree of images using just HTML, JavaScript, and JSON. The site files will be generated in a child directory under the root of your web site. It was designed to be VR-friendly for VR games that feature a web browser, and run locally in a web server on your PC.
 
-#Features
+# Features
 
 For any directory in your website, you can view a slideshow of all images in that folder, or of all images in all descendant folders, too, in one large slideshow. The generated website has a directory navigator, and within each directory you can start one of the types of slideshows. Once you've begun a slideshow, you can pause and resume it, manually navigate forward or backward, view the path of the current image, or go back up to the directory page. Each of these features are hidden until you hover over the appropriate region of the image.
 
@@ -18,7 +18,7 @@ Swag will not display a directory in its directory browser unless it or some of 
 
 Swag will read and use Windows shortcut files as long as they point to images within the website. This lets you create mixes of images from folders that aren't related to eachother into one slideshow. Simple "Copy" and "Paste Shortcut" multiple images into one folder, and Swag will be able to read them and create a slideshow.
 
-#Usage
+# Usage
 
 First, you must setup your website. This can be as simple as creating a new website in IIS (Internet Information Services, built into Windows) that points to the root folder of images, and then running the tool pointing at that same path. There are many simple web server programs you can install as well. Any vanilla HTTP server will do. There is no back-end code in Swag. It simply generates static HTML, CSS, JavaScript, and JSON files.
 
@@ -41,11 +41,11 @@ If you have a website running at the root of your X: drive with two folders name
     
     Swag X:\ www Y Z
       
-#Building Swag Yourself
+# Building Swag Yourself
 
 Swag requires .Net 4.5. It has no external dependencies, but it uses [ILMerge](https://www.microsoft.com/en-us/download/details.aspx?id=17630) in a post-build event to create a self-contained EXE. You can remove this post-build event if you don't wish to install or use ILMerge.
 
-#Future Changes
+# Future Changes
 
 * A GUI would be nice. There's already code to handle a Cancel button during generation.
 * Event-based progress indicators.
