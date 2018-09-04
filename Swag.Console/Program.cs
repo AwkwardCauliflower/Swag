@@ -27,28 +27,30 @@ namespace Swag
             }
             catch ( CommandLineArgumentException e )
             {
-                Console.WriteLine( e.Message );
-                WriteUsage();
+                WriteUsage( "ERROR: " + e.Message );
             }
+
+            Console.WriteLine( "Press any key..." );
+            Console.ReadKey();
         }
 
         private static Args ValidateAndParseArgs( string[] args )
         {
             if ( args.Length < 2 )
             {
-                WriteUsage( "Not enough args." );
+                throw new CommandLineArgumentException( "Not enough args." );
             }
 
             DirectoryInfo dir = new DirectoryInfo( args[ 0 ] );
 
             if ( !dir.Exists )
             {
-                WriteUsage( "First arg must be a directory which exists." );
+                throw new CommandLineArgumentException( "First arg must be a directory which exists." );
             }
 
             if ( !IsValidFilename( args[ 1 ].Trim() ) )
             {
-                WriteUsage( "Second arg must be a valid Windows folder name." );
+                throw new CommandLineArgumentException( "Second arg must be a valid Windows folder name." );
             }
 
             Args parsedArgs = new Args()
@@ -97,22 +99,10 @@ Note: this will exclude all directories and files that contain the words 'GIFs' 
             if ( message != null )
             {
                 Console.WriteLine( message );
+                Console.WriteLine();
             }
 
             Console.WriteLine( usage );
-        }
-
-        private static void TestPointSize()
-        {
-            int startingPointSize = 12;
-
-            for ( int i = 0; i < 16; i++ )
-            {
-                Console.WriteLine( Math.Max( startingPointSize - i / 2, 1 ) );
-            }
-
-            Console.WriteLine( "Press any key..." );
-            Console.ReadKey();
         }
 
         private static void GenerateGallery( string path, string webFolderName, List<string> blacklist = null )
@@ -131,9 +121,6 @@ Note: this will exclude all directories and files that contain the words 'GIFs' 
             var seconds = sw.Elapsed.TotalSeconds;
 
             Console.WriteLine( "Elapsed seconds: " + Math.Round( seconds, 1 ) );
-
-            Console.WriteLine( "Press any key..." );
-            Console.ReadKey();
         }
     }
 
