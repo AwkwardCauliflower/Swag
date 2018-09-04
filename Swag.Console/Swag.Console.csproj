@@ -62,8 +62,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>mkdir $(TargetDir)Merged
-"C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /targetplatform:v4 $(TargetPath) $(TargetDir)Auto.ImageTree.dll $(TargetDir)Auto.StaticWebGalleryGenerator.dll /out:$(TargetDir)Merged/$(TargetName).exe</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

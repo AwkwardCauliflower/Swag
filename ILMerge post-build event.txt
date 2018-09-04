@@ -1,0 +1,2 @@
+mkdir $(TargetDir)Merged
+"C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /targetplatform:v4 $(TargetPath) $(TargetDir)Auto.ImageTree.dll $(TargetDir)Auto.StaticWebGalleryGenerator.dll /out:$(TargetDir)Merged/$(TargetName).exe
