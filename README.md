@@ -16,7 +16,7 @@ Swag does not copy any of your images to its web folder or create any thumbnails
 
 Swag will not display a directory in its directory browser unless it or some of its descendant directories contain images.
 
-Swag will read and use Windows shortcut files as long as they point to images within the website. This lets you create mixes of images from folders that aren't related to eachother into one slideshow. Simple "Copy" and "Paste Shortcut" multiple images into one folder, and Swag will be able to read them and create a slideshow.
+Swag will read and use Windows shortcut files as long as they point to images within the website. This lets you create mixes of images from folders that aren't related to each other into one slideshow. Simple "Copy" and "Paste Shortcut" multiple images into one folder, and Swag will be able to read them and create a slideshow.
 
 # Usage
 
