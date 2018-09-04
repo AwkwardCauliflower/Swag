@@ -1,0 +1,157 @@
+﻿<html>
+<head>
+	<script src="/`webFolderName`/scripts/jquery-3.3.1.js"></script>
+	<link rel="stylesheet" href="/`webFolderName`/css/slideshow-styles.css" />
+	<script type="text/javascript">
+		var images;
+		var iImage = 0;
+		var jsons = new Array();
+		var timer;
+		var paused = false;
+		jsons[0] = "`imagesJsonPath`";
+		jsons[1] = "`imagesJsonPath`";
+		jsons[2] = "`recursveJsonPath`";
+
+		$(
+			function () {
+				$("#noImages").hide();
+				$("#image, #pause, #previous, #next").hide();
+
+				var iJson = getParameterByName("j");
+
+				$.getJSON(jsons[iJson], function (data) {
+					images = data.images
+					if (iJson > 0) {
+						//re-randomize images
+						images = shuffle(images);
+					}
+				})
+				.fail(function () {
+					alert("Failed to load image list.");
+				})
+				.done(function () {
+					if( images.length > 0 )
+					{
+						loadImage();
+						start();
+						$("#image, #pause, #previous, #next").show();
+					}
+					else {
+						$("#noImages").show();
+					}
+				});
+
+				$("#pause").click(function () {
+					if (paused) {
+						start();
+					}
+					else {
+						stop();
+					}
+				})
+
+				$("#previous").click(function () {
+					previous();
+				})
+
+				$("#next").click(function () {
+					next();
+				})
+			}
+		);
+
+		function tick() {
+			incrementImage();
+			loadImage();
+		}
+
+		function start() {
+			paused = false;
+			$("#pause").html('<img class=invisibleButtonImage" src="/`webFolderName`/Images/pause.png" />')
+			timer = setInterval(tick, 10000);
+		}
+
+		function stop() {
+			paused = true;
+			$("#pause").html('<img class=invisibleButtonImage" src="/`webFolderName`/Images/play.png" />')
+			clearInterval(timer);
+		}
+
+		function previous() {
+			var wasPaused = paused;
+
+			if (!wasPaused) stop();
+
+			decrementImage();
+			loadImage();
+
+			if (!wasPaused) start();
+		}
+
+		function next() {
+			var wasPaused = paused;
+
+			if (!wasPaused) stop();
+
+			incrementImage();
+			loadImage();
+
+			if (!wasPaused) start();
+		}
+
+		function incrementImage() {
+			//loop back to image one if there are no more images.
+			iImage = (iImage < images.length - 1) ? iImage + 1 : 0;
+		}
+
+		function decrementImage() {
+			iImage = (iImage == 0) ? images.length - 1 : iImage - 1;
+		}
+
+		function loadImage() {
+			$("#image").attr("src", images[iImage]);
+			$("#path").text(images[iImage])
+		}
+
+		function getParameterByName(name, url) {
+			if (!url) url = window.location.href;
+			name = name.replace(/[\[\]]/g, "\\$&");
+			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+				results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, " "));
+		}
+
+		function shuffle(array) {
+			var currentIndex = array.length, temporaryValue, randomIndex;
+
+			// While there remain elements to shuffle...
+			while (0 !== currentIndex) {
+
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentIndex);
+				currentIndex -= 1;
+
+				// And swap it with the current element.
+				temporaryValue = array[currentIndex];
+				array[currentIndex] = array[randomIndex];
+				array[randomIndex] = temporaryValue;
+			}
+
+			return array;
+		}
+	</script>
+</head>
+<body>
+	<img id="image" src="" />
+	<div id="noImages">
+		<p>There are no images to show.</p>
+	</div>
+	<a id="index" class="invisibleButton" href="index.html"><img class="invisibleButtonImage" src="/`webFolderName`/Images/up.png" /></a>
+	<a id="pause" class="invisibleButton" href="#"><img class="invisibleButtonImage" src="/`webFolderName`/Images/pause.png" /></a>
+	<a id="previous" class="invisibleButton" href="#"><img class="invisibleButtonImage" src="/`webFolderName`/Images/previous.png" /></a>
+	<a id="next" class="invisibleButton" href="#"><img class="invisibleButtonImage" src="/`webFolderName`/Images/next.png" /></a>
+	<div id="path"></div>
+</body>
+</html>

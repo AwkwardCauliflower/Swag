@@ -1,0 +1,78 @@
+body {
+	font-family: Arial, sans-serif;
+	background-color: white;
+	font-size: 12pt;
+}
+
+.imageFolderPath{
+	font-weight: bold;
+	font-size: 14pt;
+}
+
+.button {
+	display: block;
+	font-weight: bold;
+	text-decoration: none;
+	background-color: #EEEEEE;
+	color: #333333;
+	padding: 2px 6px 2px 6px;
+	border-top: 1px solid #CCCCCC;
+	border-right: 1px solid #333333;
+	border-bottom: 1px solid #333333;
+	border-left: 1px solid #CCCCCC;
+}
+
+.button > .imageCount{
+	font-size: 8pt;
+}
+
+.indexButton{
+	width: 85px;
+	height: 60px;
+	float: left;
+	margin: 2px;
+}
+
+.indexButton:hover{
+	border: 2px solid red;
+	margin: 1px;
+}
+
+.indexButtonDisabled
+{
+	display: none;
+}
+
+p {
+	margin: 0;
+	padding: 0;
+	margin-bottom: 3px;
+}
+
+a.subDirectoryButton,		
+a.subDirectoryButton:hover,
+a.subDirectoryButton:visited{
+	color: #333333;
+}
+
+a.subDirectoryButton{
+	height: 80px;
+	width: 120px;
+	/*border: 1px solid black;*/
+	border-top: 1px solid #CCCCCC;
+	border-right: 1px solid #333333;
+	border-bottom: 1px solid #333333;
+	border-left: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 2px;
+	padding: 2px 6px 2px 6px;
+	overflow: hidden;
+	word-wrap: break-word;
+	text-decoration: none;
+}
+
+a.subDirectoryButton:hover {
+	border: 2px solid red;
+	margin: 1px;
+}
