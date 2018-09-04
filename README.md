@@ -36,9 +36,7 @@ Swag is a command line tool. It has two required arguments: the path to the root
                        containing any of the strings will be ignored. The 
                        webFolder name is automatically blacklisted, as are all
                        system folders.
-                       
-    Example usage:
-    
+
 If you have a website running at the root of your X: drive with two folders named 'Y' and 'Z' which you don't want included, and you want Swag's folder to be named 'www', you would use the following command:
     
     Swag X:\ www Y Z
