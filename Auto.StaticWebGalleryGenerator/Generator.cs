@@ -11,6 +11,11 @@ using System.Reflection;
 namespace Auto.StaticWebGalleryGenerator
 {
     /// <summary>
+    /// Delegate type for web file generation events.
+    /// </summary>
+    public delegate void DirectoryGenerateStart( DirectoryGenerateInfo info );
+
+    /// <summary>
     /// Traverses a directory and all subdirectories, finds all images, then generates a static website for viewing those images. 
     /// </summary>
     public class Generator
@@ -86,6 +91,26 @@ namespace Auto.StaticWebGalleryGenerator
         public bool DeleteWebFolder { get; private set; }
 
         /// <summary>
+        /// Event called when scanning a directory for images starts.
+        /// </summary>
+        public event DirectoryScanStart ScanStarted;
+
+        /// <summary>
+        /// Event called when scanning a directory causes an exception.
+        /// </summary>
+        public event DirectoryScanStart ScanFailed;
+
+        /// <summary>
+        /// Event called when generation of web files for a directory starts.
+        /// </summary>
+        public event DirectoryGenerateStart GenerationStarted;
+
+        /// <summary>
+        /// Event called when generation of web files for a directory causes an exception.
+        /// </summary>
+        public event DirectoryGenerateStart GenerationFailed;
+
+        /// <summary>
         /// Populates the image tree and sets <see cref="RootImageTree"/>. Must be called before calling <see cref="GenerateWebsite"/>.
         /// </summary>
         /// <param name="token"></param>
@@ -100,7 +125,8 @@ namespace Auto.StaticWebGalleryGenerator
                     Blacklist = Blacklist
                 };
 
-                //TODO: handle and echo an event each time a new directory is being parsed, to provide some textual feedback.
+                RootImageTree.ScanStarted += ScanStarted;
+                RootImageTree.ScanFailed += ScanFailed;
 
                 RootImageTree.Populate( token );
 
@@ -150,39 +176,45 @@ namespace Auto.StaticWebGalleryGenerator
 
             if ( token.IsCancellationRequested ) return;
 
-            //TODO: expose an event each time a new directory is being parsed, to provide some feedback.
             CreateGalleryPage( RootImageTree, wwwDirectory, token );
         }
 
         private void CreateGalleryPage( ImageTreeDirectory currentImageTree, DirectoryInfo currentSlideDirectory, CancellationToken token )
         {
-            Console.WriteLine( "Generate: " + currentSlideDirectory.FullName );
+            GenerationStarted?.Invoke( new DirectoryGenerateInfo { Directory = currentSlideDirectory } );
 
             if ( token.IsCancellationRequested ) return;
 
-            var currentImages = currentImageTree.DescendantImages.Where( p => p.Depth == 0 ).OrderBy( p => p.Item.FileInfo.Name );
-            var deepImages = currentImageTree.DescendantImages;
-
-            int countOwnImages = currentImages.Count();
-            //Don't count current images as deep images, even though they will be included in the recursive JSON.
-            int countDeepImages = deepImages.Count( p => p.Depth > 0 );
-
-            var subTreesWithImages = currentImageTree.ChildDirectories.Where( p => p.DescendantImages.Count > 0 );
-
-            WriteJson( currentSlideDirectory, currentImages, deepImages, countOwnImages, countDeepImages );
-
-            if ( token.IsCancellationRequested ) return;
-
-            WriteIndexPage( currentImageTree, subTreesWithImages, currentSlideDirectory, countOwnImages, countDeepImages );
-            WriteSlideshowPage( currentSlideDirectory );
-
-            foreach ( var subImageTree in subTreesWithImages )
+            try
             {
+                var currentImages = currentImageTree.DescendantImages.Where( p => p.Depth == 0 ).OrderBy( p => p.Item.FileInfo.Name );
+                var deepImages = currentImageTree.DescendantImages;
+
+                int countOwnImages = currentImages.Count();
+                //Don't count current images as deep images, even though they will be included in the recursive JSON.
+                int countDeepImages = deepImages.Count( p => p.Depth > 0 );
+
+                var subTreesWithImages = currentImageTree.ChildDirectories.Where( p => p.DescendantImages.Count > 0 );
+
+                WriteJson( currentSlideDirectory, currentImages, deepImages, countOwnImages, countDeepImages );
+
                 if ( token.IsCancellationRequested ) return;
 
-                var subSlideDirectory = currentSlideDirectory.CreateSubdirectory( subImageTree.DirectoryInfo.Name );
+                WriteIndexPage( currentImageTree, subTreesWithImages, currentSlideDirectory, countOwnImages, countDeepImages );
+                WriteSlideshowPage( currentSlideDirectory );
 
-                CreateGalleryPage( subImageTree, subSlideDirectory, token );
+                foreach ( var subImageTree in subTreesWithImages )
+                {
+                    if ( token.IsCancellationRequested ) return;
+
+                    var subSlideDirectory = currentSlideDirectory.CreateSubdirectory( subImageTree.DirectoryInfo.Name );
+
+                    CreateGalleryPage( subImageTree, subSlideDirectory, token );
+                }
+            }
+            catch ( Exception ex )
+            {
+                GenerationFailed?.Invoke( new DirectoryGenerateInfo { Directory = currentSlideDirectory, Exception = ex } );
             }
         }
 

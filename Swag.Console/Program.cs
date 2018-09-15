@@ -113,6 +113,11 @@ Note: this will exclude all directories and files that contain the words 'GIFs' 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
             Generator gen = new Generator( path, webFolderName, blacklist, deleteWebFolder: true );
+            gen.ScanStarted += Gen_ScanStarted;
+            gen.ScanFailed += Gen_ScanFailed;
+            gen.GenerationStarted += Gen_GenerationStarted;
+            gen.GenerationFailed += Gen_GenerationFailed;
+
             gen.PopulateImageTree( cancellationTokenSource.Token );
             gen.GenerateWebsite( cancellationTokenSource.Token );
 
@@ -121,6 +126,39 @@ Note: this will exclude all directories and files that contain the words 'GIFs' 
             var seconds = sw.Elapsed.TotalSeconds;
 
             Console.WriteLine( "Elapsed seconds: " + Math.Round( seconds, 1 ) );
+        }
+
+        private static void Gen_ScanStarted( DirectoryScanInfo info )
+        {
+            WriteOperationStart( "Scan", info.Directory );
+        }
+
+        private static void Gen_ScanFailed( DirectoryScanInfo info )
+        {
+            WriteOperationException( "Scan", info.Directory, info.Exception );
+        }
+
+        private static void Gen_GenerationStarted( DirectoryGenerateInfo info )
+        {
+            WriteOperationStart( "Generate", info.Directory );
+        }
+
+        private static void Gen_GenerationFailed( DirectoryGenerateInfo info )
+        {
+            WriteOperationException( "Generate", info.Directory, info.Exception );
+        }
+
+        private static void WriteOperationStart( string operationType, DirectoryInfo directory )
+        {
+            Console.WriteLine( "{0} {1}", operationType, directory.FullName );
+        }
+
+        private static void WriteOperationException( string operationType, DirectoryInfo directory, Exception ex )
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine( "{0} {1}", operationType, directory.FullName );
+            Console.WriteLine( ex.ToString() );
+            Console.ResetColor();
         }
     }
 

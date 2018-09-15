@@ -44,6 +44,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DescendantImageItem.cs" />
     <Compile Include="DirectoryInfoExtensionMethods.cs" />
+    <Compile Include="DirectoryScanInfo.cs" />
     <Compile Include="ImageItem.cs" />
     <Compile Include="ImageTreeDirectory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

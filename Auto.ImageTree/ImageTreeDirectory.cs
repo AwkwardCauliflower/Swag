@@ -8,6 +8,11 @@ using System.Threading;
 namespace Auto.ImageTree
 {
     /// <summary>
+    /// Delegate type for directory scanning events.
+    /// </summary>
+    public delegate void DirectoryScanStart( DirectoryScanInfo info );
+
+    /// <summary>
     /// Holds a tree of images as well as a flattened list of descendant images at every level. Each time an 
     /// image is found, all ancestor nodes are informed of this file and it's relative depth. This saves needing to
     /// traverse the tree to find the same descendants over and over again when using the data.
@@ -49,9 +54,19 @@ namespace Auto.ImageTree
         /// <summary>
         /// Set to true after the Populate method completes.
         /// </summary>
-		public bool IsPopulated { get; private set; }
+		public bool IsPopulated { get; private set; }        
 
-		public ImageTreeDirectory( DirectoryInfo directory, ImageTreeDirectory parent = null )
+        /// <summary>
+        /// Event called when scanning a directory for images starts.
+        /// </summary>
+        public event DirectoryScanStart ScanStarted;
+
+        /// <summary>
+        /// Event called when scanning a directory causes an exception.
+        /// </summary>
+        public event DirectoryScanStart ScanFailed;
+
+        public ImageTreeDirectory( DirectoryInfo directory, ImageTreeDirectory parent = null )
 		{
 			if ( !directory.Exists )
 			{
@@ -68,54 +83,64 @@ namespace Auto.ImageTree
         /// <param name="token"></param>
 		public void Populate( CancellationToken token )
 		{
-			Console.WriteLine( "Scan: " + DirectoryInfo.FullName );
+            ScanStarted?.Invoke( new DirectoryScanInfo { Directory = DirectoryInfo } );
 
 			if ( token.IsCancellationRequested ) return;
 
-			EnsureShortcutUtility();
+            try
+            {
+                EnsureShortcutUtility();
 
-			List<ImageItem> children = new List<ImageItem>();
-			ImageItem child;
+                List<ImageItem> children = new List<ImageItem>();
+                ImageItem child;
 
-			foreach ( var file in DirectoryInfo.EnumerateFilesByExtensions( Constants.IMAGE_FILE_EXTENSIONS_PLUS_LINK ) )
-			{
-				if ( token.IsCancellationRequested ) return;
+                foreach ( var file in DirectoryInfo.EnumerateFilesByExtensions( Constants.IMAGE_FILE_EXTENSIONS_PLUS_LINK ) )
+                {
+                    if ( token.IsCancellationRequested ) return;
 
-				child = new ImageItem( file, ShortcutUtility );
+                    child = new ImageItem( file, ShortcutUtility );
 
-				if ( child.IsImage )
-				{
-					children.Add( child );
-				}
-			}
+                    if ( child.IsImage )
+                    {
+                        children.Add( child );
+                    }
+                }
 
-			if ( token.IsCancellationRequested ) return;
+                if ( token.IsCancellationRequested ) return;
 
-			AddDescendants( children, 0 );
+                AddDescendants( children, 0 );
 
-			EnsureBlacklist();
+                EnsureBlacklist();
 
-			foreach ( var subDir in DirectoryInfo.EnumerateDirectories() )
-			{
-				if ( token.IsCancellationRequested ) return;
+                foreach ( var subDir in DirectoryInfo.EnumerateDirectories() )
+                {
+                    if ( token.IsCancellationRequested ) return;
 
-				if ( !BlacklistExcludes( subDir.FullName ) && !subDir.Attributes.HasFlag( FileAttributes.System ) )
-				{
-					var subTreeDir = new ImageTreeDirectory( subDir, this )
-					{
-						Blacklist = Blacklist,
-						ShortcutUtility = ShortcutUtility
-					};
+                    if ( !BlacklistExcludes( subDir.FullName ) && !subDir.Attributes.HasFlag( FileAttributes.System ) )
+                    {
+                        var subTreeDir = new ImageTreeDirectory( subDir, this )
+                        {
+                            Blacklist = Blacklist,
+                            ShortcutUtility = ShortcutUtility
+                        };
 
-					subTreeDir.Populate( token );
+                        subTreeDir.ScanStarted += ScanStarted;
+                        subTreeDir.ScanFailed += ScanFailed;
 
-					if ( token.IsCancellationRequested ) return;
+                        subTreeDir.Populate( token );
 
-					ChildDirectories.Add( subTreeDir );
-				}
-			}
+                        if ( token.IsCancellationRequested ) return;
 
-			IsPopulated = true;
+                        ChildDirectories.Add( subTreeDir );
+                    }
+                }
+
+                IsPopulated = true;
+            }
+            catch ( Exception ex )
+            {
+                ScanFailed?.Invoke( new DirectoryScanInfo { Directory = DirectoryInfo, Exception = ex } );
+            }
 		}
 
 		private void EnsureShortcutUtility()
